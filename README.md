@@ -2,7 +2,7 @@
 
 # Description
 Sorts [Consistent Tree](https://bitbucket.org/pbehroozi/consistent-trees) outputs into contiguous order.
-**Written in C, probably only works on Linux. **
+*Written in C, probably only works on Linux*. 
 
 # Motivation
 Consistent tree output is spread out over various ``tree_*_*_*.dat`` files with a ``locations.dat`` file
@@ -28,9 +28,9 @@ $ ./sort_forests <input directory> <output directory>
 ```
 
 Input directory should contain ``forests.list``, ``locations.dat`` and ``tree_*_*_*.dat`` files.
-Output directory will contain the new ``forests.list``, locations.dat`` and ``tree_*_*_*.dat`` files.
+Output directory will contain the new ``forests.list``, ``locations.dat`` and ``tree_*_*_*.dat`` files.
 In addition, the output directory also contains ``forests_and_locations_new.dat`` file that contains
-``forest id``, ``tree_root_id``, ``fileid``, ``offset``, ``filename`` and a new column ``bytes`` that
+``forest id``, ``tree_root_id``, ``fileid``, ``offset``, ``filename`` and a new column _``bytes``_ that
 gives the number of (ASCII) bytes in each tree. This ``bytes`` column will let you pre-allocated a
 buffer for a tree and read in the entire tree in one go (rather than line by line). 
 
