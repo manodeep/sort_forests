@@ -9,7 +9,7 @@ Consistent tree output is spread out over various ``tree_*_*_*.dat`` files with 
 specifying the ``tree_root_id``, ``fileid`` and ``offset`` to read in the data. ``Sort_forests`` resorts
 the entire data-set such that all forests are grouped contiguously in the same file -- speeding up IO.
 
-The code is written to be very fast and uses lower level system calls. 
+The code is written to be very fast and uses lower level system calls. For instance, rewriting entire 1.2 TB of  [Bolshoi](http://www.slac.stanford.edu/~behroozi/Bolshoi_Trees/) trees takes 12 hours on a single cpu. 
 
 # Installation
 
