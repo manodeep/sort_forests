@@ -11,11 +11,12 @@ the entire data-set such that all forests are grouped contiguously in the same f
 
 The code is written to be very fast and uses lower level system calls. 
 
-# Installing
+# Installation
 
 ## Pre-requisites
 1. A C compiler (gcc/icc/clang). gcc is default.
 
+## Compiling
 ```
 $ git clone https://github.com/manodeep/sort_forests/
 $ make
