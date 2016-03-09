@@ -383,7 +383,12 @@ int main(int argc, char **argv)
     int *tree_inputs_fd = my_malloc(sizeof(*tree_inputs_fd), nfiles);
     int *tree_outputs_fd = my_malloc(sizeof(*tree_outputs_fd), nfiles);    
 
-    int *tree_outputs_fd_offset = my_malloc(sizeof(*tree_outputs_fd_offset), nfiles);
+    XASSERT(sizeof(off_t) == 8,
+            "File offset bits must be 64\n"
+            "Please ensure "ANSI_COLOR_RED"#define _FILE_OFFSET_BITS 64"ANSI_COLOR_RESET" is present\n");
+
+    off_t *tree_outputs_fd_offset = my_malloc(sizeof(*tree_outputs_fd_offset), nfiles);
+
 
     int64_t *tree_counts = my_calloc(sizeof(*tree_counts), nfiles);
     int64_t *inp_file_sizes = my_calloc(sizeof(*inp_file_sizes), nfiles);
