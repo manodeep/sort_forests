@@ -1,7 +1,5 @@
 # Sort_Forests
 
-__DO NOT USE. BUG IN CODE FOR COMPUTING OFFSETS__
-
 # Description
 Sorts [Consistent Tree](https://bitbucket.org/pbehroozi/consistent-trees) outputs into contiguous order.
 *Written in C, probably only works on Linux*. 
