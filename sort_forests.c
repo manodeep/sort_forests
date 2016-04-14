@@ -399,7 +399,9 @@ int main(int argc, char **argv)
                 my_snprintf(buffer,MAXLEN,"%s/tree_%d_%d_%d.dat", input_dir, i, j, k);
                 int id = id = i*BOX_DIVISIONS*BOX_DIVISIONS + j*BOX_DIVISIONS + k;
                 tree_inputs[id]  = my_fopen(buffer, "r");
-                /* setbuf(tree_inputs[id], _IONBF); */
+                
+                XASSERT(setvbuf(tree_inputs[id], NULL, _IONBF, 0) == 0,
+                        "Could not set unbuffered fgets");
                 my_fseek(tree_inputs[id],0L, SEEK_END);
                 inp_file_sizes[id] = ftello(tree_inputs[id]);
                 rewind(tree_inputs[id]);
