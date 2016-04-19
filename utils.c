@@ -137,29 +137,38 @@ int64_t copy_bytes_between_two_files(const size_t bytes, FILE *in, FILE *out)
 }    
 
 
-int64_t copy_bytes_with_pread(const size_t bytes, int in, int out, off_t offset)
+int64_t copy_bytes_with_pread(const size_t in_bytes, int in, int out, off_t offset)
 {
-    char buffer[MAXLEN];
-    size_t bytes_written = 0;
+    const int64_t maxbufsize=4096;
+    char buffer[maxbufsize];
+    int64_t bytes_written = 0;
+    const int64_t bytes = (int64_t) in_bytes;
     int64_t bytes_read;
     if(bytes == 0) {
         return 0;
     }
 
-    
     while(bytes_written < bytes) {
-        const int bytes_left = (bytes - bytes_written) > MAXLEN ? MAXLEN:(bytes - bytes_written);
-        if( (bytes_read = pread(in, buffer, bytes_left, offset)) > 0 ) {
+        const int64_t bytes_left = (bytes - bytes_written) > maxbufsize ? maxbufsize:(bytes - bytes_written);
+         if( (bytes_read = pread(in, buffer, bytes_left, offset)) > 0 ) {
             offset += bytes_read;
-            if(write(out, buffer, bytes_read) != bytes_read) {
-                fprintf(stderr,"Could not write %zu bytes\n",bytes_read);
-                exit(EXIT_FAILURE);
-            } else {
-                bytes_written += bytes_read;
+            int64_t write_offset = 0;
+            int64_t write_bytes_left = bytes_read;
+            while(write_bytes_left > 0) {
+                const int64_t bytes_this_write = write(out, buffer+write_offset, bytes_left);
+                if(bytes_this_write < 0) {
+                    fprintf(stderr,"ERROR: Could not write `%"PRId64"'bytes \n", bytes_left);
+                    perror(NULL);
+                    exit(EXIT_FAILURE);
+                }
+                write_offset += bytes_this_write;
+                write_bytes_left -= bytes_this_write;
             }
+            bytes_written += bytes_read;
         } else {
             fprintf(stderr, "Could not read requested %zu bytes - only have copied bytes = %zu\n",
                     bytes, bytes_written);
+            perror(NULL);
             exit(EXIT_FAILURE);
         }
     }

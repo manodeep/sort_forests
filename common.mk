@@ -15,12 +15,6 @@ GSL_CFLAGS := $(shell gsl-config --cflags)
 GSL_LIBDIR := $(shell gsl-config --prefix)/lib
 GSL_LINK   := $(shell gsl-config --libs) -Xlinker -rpath -Xlinker $(GSL_LIBDIR)
 
-ifneq (USE_OMP,$(findstring USE_OMP,$(OPT)))
-  ifneq (clang,$(findstring clang,$(CC)))
-     $(warning Recommended compiler for a serial build is clang)
-  endif
-endif
-
 ifeq (OUTPUT_RPAVG,$(findstring OUTPUT_RPAVG,$(OPT)))
   ifneq (DOUBLE_PREC,$(findstring DOUBLE_PREC,$(OPT)))
     $(error DOUBLE_PREC must be enabled with OUTPUT_RPAVG -- loss of precision will give you incorrect results for the outer bins (>=20-30 million pairs))
@@ -44,7 +38,8 @@ else
 
   ### compiler specific flags for gcc
   ifeq (gcc,$(findstring gcc,$(CC)))
-		CFLAGS += -ftree-vectorize -flto -funroll-loops #-ftree-vectorizer-verbose=6 -fopt-info-vec-missed #-fprofile-use -fprofile-correction 
+		CFLAGS += -ftree-vectorize -flto -funroll-loops #-ftree-vectorizer-verbose=6 -fopt-info-vec-missed #-fprofile-use -fprofile-correction
+        CLINK += -flto
     ifeq (USE_OMP,$(findstring USE_OMP,$(OPT)))
 			CFLAGS += -fopenmp
 			CLINK  += -fopenmp
@@ -71,7 +66,7 @@ else
   endif
 
   #### common options for gcc and clang
-  CFLAGS  += -march=native
+  CFLAGS  += -march=native -fno-strict-aliasing
 	CFLAGS  += -Wformat=2  -Wpacked  -Wnested-externs -Wpointer-arith  -Wredundant-decls  -Wfloat-equal -Wcast-qual  
   CFLAGS  +=  -Wcast-align #-Wmissing-declarations #-Wmissing-prototypes
   CFLAGS  += -Wnested-externs -Wstrict-prototypes  #-D_POSIX_C_SOURCE=2 -Wpadded -Wconversion

@@ -238,7 +238,7 @@ void assign_trees_in_forest_to_same_file(const int64_t ntrees, struct locations 
     int64_t min_fileid = locations[0].fileid;
     int64_t max_fileid = locations[0].fileid;
     int64_t start_index_forest = 0;
-    int64_t end_index_forest = 0;
+    int64_t end_index_forest = 1;
     int64_t num_trees_moved = 0;
 
     fprintf(stderr, ANSI_COLOR_MAGENTA"Assigning all trees in a forest into the same file...."ANSI_COLOR_RESET"\n");
@@ -247,7 +247,7 @@ void assign_trees_in_forest_to_same_file(const int64_t ntrees, struct locations 
     init_my_progressbar(ntrees, &interrupted);
    
     for(int64_t i=1;i<ntrees;i++) {
-        my_progressbar(i, &interrupted);
+        /* my_progressbar(i, &interrupted); */
         if(locations[i].forestid == start_forestid) {
             if(locations[i].fileid < min_fileid) {
                 min_fileid = locations[i].fileid;
@@ -263,9 +263,9 @@ void assign_trees_in_forest_to_same_file(const int64_t ntrees, struct locations 
                     new_locations[j].fileid = min_fileid;
                 }
             } else {
-                /* fprintf(stderr,"For forest id = %"PRId64" trees are stored in separate files (min, max) = (%"PRId64", %"PRId64")\n", */
-                /*         start_forestid, min_fileid, max_fileid); */
-                /* interrupted=1; */
+                fprintf(stderr,"For forest id = %"PRId64" trees are stored in separate files (min, max) = (%"PRId64", %"PRId64")\n",
+                        start_forestid, min_fileid, max_fileid);
+                interrupted=1;
 
                 /* create a histogram of the fileids */
                 memset(histogram_fileids, 0, sizeof(*histogram_fileids) * nfiles);
@@ -290,18 +290,20 @@ void assign_trees_in_forest_to_same_file(const int64_t ntrees, struct locations 
                     my_snprintf(new_locations[j].filename, LOCATIONS_FILENAME_SIZE, "tree_%d_%d_%d.dat", ii, jj, kk);
                     if(new_locations[j].fileid != locations[j].fileid) {
                         num_trees_moved++;
+                        fprintf(stderr,"Moved tree = %10"PRId64" from fileid=%3"PRId64" to fileid=%3"PRId64"\n",locations[j].tree_root, locations[j].fileid, new_locations[j].fileid);
+                        interrupted=1;
                     }
                 }
             }
 
             start_forestid = locations[i].forestid;
             start_index_forest = i;
-            end_index_forest   = i;
+            end_index_forest   = i+1;
             min_fileid = locations[i].fileid;
             max_fileid = locations[i].fileid;
         }
     }
-    finish_myprogressbar(&interrupted);        
+    finish_myprogressbar(&interrupted);
     free(histogram_fileids);
     if(num_trees_moved > 0) {
         fprintf(stderr,"Number of trees moved into different files = %"PRId64"\n",num_trees_moved);
@@ -310,11 +312,17 @@ void assign_trees_in_forest_to_same_file(const int64_t ntrees, struct locations 
 }
 
 
+int64_t compute_numbytes_with_off(const int64_t off, const int64_t start)
+{
+    return off - start; /* Or should there be a -1?*/
+}
+
+
 int64_t compute_numbytes(FILE *fp, const int64_t start)
 {
     const int64_t off = ftello(fp);
-    return off - start; /* Or should there be a -1?*/
-}    
+    return compute_numbytes_with_off(off, start);
+}
 
 int64_t write_forests_and_locations(const char *filename, const int64_t ntrees, const struct locations *locations)
 {
@@ -452,8 +460,7 @@ int main(int argc, char **argv)
         /* Are we starting on a new file ?*/
         if(start_fileid != fileid) {
             /* fill out the bytes for the last tree in the previous file */
-            my_fseek(tree_inputs[start_fileid], 0L, SEEK_END);
-            const int64_t num_bytes = compute_numbytes(tree_inputs[start_fileid], start);
+            const int64_t num_bytes = compute_numbytes_with_off(inp_file_sizes[start_fileid], start);
             locations[i-1].bytes = num_bytes;
             new_locations[i-1].bytes = num_bytes;
 
