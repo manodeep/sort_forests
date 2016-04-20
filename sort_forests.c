@@ -247,7 +247,7 @@ void assign_trees_in_forest_to_same_file(const int64_t ntrees, struct locations 
     init_my_progressbar(ntrees, &interrupted);
    
     for(int64_t i=1;i<ntrees;i++) {
-        /* my_progressbar(i, &interrupted); */
+        my_progressbar(i, &interrupted);
         if(locations[i].forestid == start_forestid) {
             if(locations[i].fileid < min_fileid) {
                 min_fileid = locations[i].fileid;
@@ -263,9 +263,9 @@ void assign_trees_in_forest_to_same_file(const int64_t ntrees, struct locations 
                     new_locations[j].fileid = min_fileid;
                 }
             } else {
-                fprintf(stderr,"For forest id = %"PRId64" trees are stored in separate files (min, max) = (%"PRId64", %"PRId64")\n",
-                        start_forestid, min_fileid, max_fileid);
-                interrupted=1;
+                /* fprintf(stderr,"For forest id = %"PRId64" trees are stored in separate files (min, max) = (%"PRId64", %"PRId64")\n", */
+                /*         start_forestid, min_fileid, max_fileid); */
+                /* interrupted=1; */
 
                 /* create a histogram of the fileids */
                 memset(histogram_fileids, 0, sizeof(*histogram_fileids) * nfiles);
@@ -290,8 +290,8 @@ void assign_trees_in_forest_to_same_file(const int64_t ntrees, struct locations 
                     my_snprintf(new_locations[j].filename, LOCATIONS_FILENAME_SIZE, "tree_%d_%d_%d.dat", ii, jj, kk);
                     if(new_locations[j].fileid != locations[j].fileid) {
                         num_trees_moved++;
-                        fprintf(stderr,"Moved tree = %10"PRId64" from fileid=%3"PRId64" to fileid=%3"PRId64"\n",locations[j].tree_root, locations[j].fileid, new_locations[j].fileid);
-                        interrupted=1;
+                        /* fprintf(stderr,"Moved tree = %10"PRId64" from fileid=%3"PRId64" to fileid=%3"PRId64"\n",locations[j].tree_root, locations[j].fileid, new_locations[j].fileid); */
+                        /* interrupted=1; */
                     }
                 }
             }
